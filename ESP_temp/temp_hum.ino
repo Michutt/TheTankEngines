@@ -7,6 +7,7 @@
 #include <PubSubClient.h>
 
 #define DHTPIN 2
+#define RELAY D0
 #define DHTTYPE DHT11  
 #define SCREEN_WIDTH 128
 #define SCREEN_HEIGHT 64
@@ -41,14 +42,24 @@ void setup() {
   delay(3000);
   client.setServer(malinkaIP, 1883);
   performMQTTConnection();
-  delay(3000);
+  client.setCallback(callback);
 }
 
 void loop() {
-
   displaySensorData();
   displayWifiInfo();
   sendSensorData();
+//  client.loop();
+//  client.subscribe("esp32/gpio");
+}
+
+void callback(char* topic, byte* payload, unsigned int length) {
+  Serial.println(topic);
+  if (payload)
+  {
+    digitalWrite(RELAY, !digitalRead(RELAY));
+  } 
+
 }
 
 void sendSensorData()
@@ -57,10 +68,8 @@ void sendSensorData()
   String humData = String(h);
   tempData.toCharArray(message, 20);
   client.publish("temperature", message);
-  Serial.print(message);
   humData.toCharArray(message, 20);
   client.publish("humidity", message);
-  Serial.print(message);
 }
 
 void displaySensorData(void)
