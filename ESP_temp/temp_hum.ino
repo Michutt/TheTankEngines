@@ -16,6 +16,9 @@ const char * ssid =  "UPC246291656";  //NEVERGONNA
 const char * pass =  "KXECSTJQ";  //GIVEYOUUP
 const char * malinkaIP = "192.168.1.241";
 
+float t = 0;
+float h = 0;
+
 WiFiClient esp;
 PubSubClient client(esp);
 char message[20];
@@ -42,34 +45,42 @@ void setup() {
 }
 
 void loop() {
-  display.clearDisplay();
-  float h = dht.readHumidity();
-  float t = dht.readTemperature();
 
-  if (isnan(h) || isnan(t)) 
-  {
-    Serial.println(F("Failed to read from DHT sensor!"));
-    return;
-  }
-  delay(1000);
-  digitalWrite(D0, LOW);
-  printText("Humidity: " + String(h), 2, 0, 0);
-  printText("Temperature: " + String(t), 2, 0, 30);
-  delay(1000);
-  display.display();
-  digitalWrite(D0, HIGH);
+  displaySensorData();
   displayWifiInfo();
-  delay(1000);
+  sendSensorData();
+}
 
-  String tempData = "temp: " + String(t);
-  String humData =  "hum: " + String(h);
+void sendSensorData()
+{
+  String tempData = String(t);
+  String humData = String(h);
   tempData.toCharArray(message, 20);
   client.publish("temperature", message);
   Serial.print(message);
   humData.toCharArray(message, 20);
   client.publish("humidity", message);
   Serial.print(message);
+}
 
+void displaySensorData(void)
+{
+  display.clearDisplay();
+  h = dht.readHumidity();
+  t = dht.readTemperature();
+
+  if (isnan(h) || isnan(t)) 
+  {
+    Serial.println(F("Failed to read from DHT sensor!"));
+    return;
+  }
+  
+  delay(1000);
+  digitalWrite(D0, LOW);
+  printText("Humidity: " + String(h), 2, 0, 0);
+  printText("Temperature: " + String(t), 2, 0, 15);
+  delay(1000);
+  display.display();
 }
 
 void printText(String text, int textSize, int x, int y) 
@@ -135,10 +146,10 @@ String ipToString(IPAddress ip)
 
 void displayWifiInfo()
 {
- display.clearDisplay();
+// display.clearDisplay();
  String wifiInfo = ipToString(WiFi.localIP());
- printText("Local network address:", 1, 0, 0);
+ printText("Local network address:", 1, 0, 40);
  display.display();
- printText(wifiInfo, 1, 0, 10);
+ printText(wifiInfo, 1, 0, 50);
  display.display();
 }
