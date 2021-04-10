@@ -1,9 +1,7 @@
 #include <Adafruit_SSD1306.h>
 #include <SPI.h>
 #include <Wire.h>
-#include <SimpleTimer.h>
 #include <Adafruit_GFX.h>
-#include <Adafruit_SSD1306.h>
 #include <ESP8266WiFi.h>
 #include <PubSubClient.h>
 
@@ -22,6 +20,8 @@ char message[20];
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
 int motionSensorPin = 12;
+
+int microPin = A0;
 
 void setup() {
   pinMode(motionSensorPin, INPUT);
@@ -42,7 +42,20 @@ void loop()
 {
   displayWifiInfo();
   displayMovementStats();
-  delay(1000);
+  readMicLevel();
+  //delay(100);
+  delayMicroseconds(1);
+}
+
+void readMicLevel()
+{
+  int micLevel = analogRead(microPin);
+  int mappedVal = map(micLevel, 0, 512, 0, 100);
+  printText("Audio level:", 1, 1, 40);
+  printText(String(mappedVal), 1, 90, 40);
+  display.display();
+  String(mappedVal).toCharArray(message, 20);
+  client.publish("audio", message);
 }
 
 void displayMovementStats()
