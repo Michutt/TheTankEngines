@@ -13,8 +13,8 @@
 #define SCREEN_HEIGHT 64
 #define OLED_RESET     -1
 
-const char * ssid =  "UPC246291656";  //NEVERGONNA
-const char * pass =  "KXECSTJQ";  //GIVEYOUUP
+const char * ssid =  "NEVERGONNA";  
+const char * pass =  "GIVEYOUUP"; 
 const char * malinkaIP = "192.168.1.241";
 
 float t = 0;
